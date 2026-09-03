@@ -29,9 +29,9 @@ endfunction()
 # The name of function must consist of folder name (doxygen) and postfix 
 # (_ArtifactInstall). Otherwise the buildprocess will fail.  
 #
-# ARTIFACT_VERSION [out]: Version of artifact in format X.Y.Z
+# ARTIFACT_BIN_PATH_ARG [in]: Path to the binary part of artifact
 #------------------------------------------------------------------------------#
-function(doxygen_ArtifactInit)
+function(doxygen_ArtifactInit ARTIFACT_BIN_PATH_ARG)
 
     # Remove previous definition to avoid warning messages
     remove_definitions(-DDOXYGEN_STATE=OFF)
@@ -44,12 +44,12 @@ function(doxygen_ArtifactInit)
     if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Windows")
     
         # Update the PATH environment variable to include Doxygen and Graphviz directories
-        set(ENV{PATH} "${DOXYGEN_CURRENT_LIST_DIR};$ENV{PATH}")
+        set(ENV{PATH} "${ARTIFACT_BIN_PATH_ARG};$ENV{PATH}")
         
     else()
     
         # Update the PATH environment variable to include Doxygen and Graphviz directories
-        set(ENV{PATH} "${DOXYGEN_CURRENT_LIST_DIR}/bin:$ENV{PATH}")
+        set(ENV{PATH} "${ARTIFACT_BIN_PATH_ARG}/bin:$ENV{PATH}")
     
     endif()
     
@@ -136,16 +136,16 @@ endfunction()
 # Function adds a path to the Doxygen input directories. This is necessary for
 # all files user wants to have in output file.
 #------------------------------------------------------------------------------#
-function(Doxygen_AddPath path)
+function(Doxygen_AddPath DOXY_FILE_PATH_ARG)
 
     # Get the current Doxygen input directories
     get_property(DOXYGEN_INPUT_DIR GLOBAL PROPERTY DOXYGEN_INPUT_DIR)
     # Add the new path to the input directories
-    set(DOXYGEN_INPUT_DIR "${DOXYGEN_INPUT_DIR} ${path}" CACHE INTERNAL "Doxygen input directories")
+    set(DOXYGEN_INPUT_DIR "${DOXYGEN_INPUT_DIR} ${DOXY_FILE_PATH_ARG}" CACHE INTERNAL "Doxygen input directories")
 
     # Print the added path if verbose mode is enabled
     if(CMAKE_VERBOSE_MAKEFILE)
-        message("Added Doxygen input directories: ${path}")
+        message("Added Doxygen input directories: ${DOXY_FILE_PATH_ARG}")
     endif()
 
 endfunction()
@@ -157,16 +157,16 @@ endfunction()
 # specific directories and its subdirectories from doxygen documentation 
 # generation.
 #------------------------------------------------------------------------------#
-function(Doxygen_AddIgnorePath path)
+function(Doxygen_AddIgnorePath DOXY_FILE_PATH_ARG)
 
     # Get the current Doxygen exclude directories
     get_property(DOXYGEN_EXCLUDE GLOBAL PROPERTY DOXYGEN_EXCLUDE)
     # Add the new path to the exclude directories
-    set(DOXYGEN_EXCLUDE "${DOXYGEN_EXCLUDE} ${path}" CACHE INTERNAL "Doxygen exclude directories")
+    set(DOXYGEN_EXCLUDE "${DOXYGEN_EXCLUDE} ${DOXY_FILE_PATH_ARG}" CACHE INTERNAL "Doxygen exclude directories")
 
     # Print the added path if verbose mode is enabled
     if(CMAKE_VERBOSE_MAKEFILE)
-        message("Added Doxygen exclude directories: ${path}")
+        message("Added Doxygen exclude directories: ${DOXY_FILE_PATH_ARG}")
     endif()
 
 endfunction()
