@@ -33,10 +33,6 @@ endfunction()
 #------------------------------------------------------------------------------#
 function(doxygen_ArtifactInit ARTIFACT_BIN_PATH_ARG)
 
-    # Remove previous definition to avoid warning messages
-    remove_definitions(-DDOXYGEN_STATE=OFF)
-    add_definitions(-DDOXYGEN_STATE=ON)
-
     # Include the default Doxygen settings from the specified CMake file
     include("${DOXYGEN_CURRENT_LIST_DIR}/CMakeDoxygenDefaults.cmake")
 
@@ -49,33 +45,41 @@ function(doxygen_ArtifactInit ARTIFACT_BIN_PATH_ARG)
     else()
     
         # Update the PATH environment variable to include Doxygen and Graphviz directories
-        set(ENV{PATH} "${ARTIFACT_BIN_PATH_ARG}/bin:$ENV{PATH}")
+        set(ENV{PATH} "${ARTIFACT_BIN_PATH_ARG}:$ENV{PATH}")
     
     endif()
     
+
+    if(NOT CMAKE_SCRIPT_MODE_FILE)
+        # Remove previous definition to avoid warning messages
+        remove_definitions(-DDOXYGEN_STATE=OFF)
+        add_definitions(-DDOXYGEN_STATE=ON)
     
-    ## Set Doxygen Documentation
-    # Find the Doxygen package, which is required
-    find_package(Doxygen REQUIRED)
-    
-    # Set output directories and configuration for Doxygen
-    set(DOXYGEN_INPUT_DIR       "") # Documentation generator input directories
-    set(DOXYGEN_OUTPUT_DIR      "${CMAKE_BINARY_DIR}/Doxygen") # Documentation target folder
-    set(DOXYGEN_CONFIG_FILE     "${CMAKE_BINARY_DIR}/Doxyfile") # Configuration doxyfile path
-    set(DOXYGEN_EXCLUDE         "") # Documentation generator ignore folders
-    set(DOXYGEN_TEMPLATE_CONFIG "${DOXYGEN_CURRENT_LIST_DIR}/Doxyfile.in") # Documentation template path
-    
-    if(NOT DEFINED MAINPAGE_MDFILE_PATH)
+        ## Set Doxygen Documentation
+        # Find the Doxygen package, which is required    
+        find_package(Doxygen REQUIRED)
         
-        set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "${CMAKE_SOURCE_DIR}/README.md")
-        set(DOXYGEN_INPUT_DIR "${DOXYGEN_INPUT_DIR} ${CMAKE_SOURCE_DIR}/README.md")
+        # Set output directories and configuration for Doxygen
+        set(DOXYGEN_INPUT_DIR       "") # Documentation generator input directories
+        set(DOXYGEN_OUTPUT_DIR      "${CMAKE_BINARY_DIR}/Doxygen") # Documentation target folder
+        set(DOXYGEN_CONFIG_FILE     "${CMAKE_BINARY_DIR}/Doxyfile") # Configuration doxyfile path
+        set(DOXYGEN_EXCLUDE         "") # Documentation generator ignore folders
+        set(DOXYGEN_TEMPLATE_CONFIG "${DOXYGEN_CURRENT_LIST_DIR}/Doxyfile.in") # Documentation template path
         
+        if(NOT DEFINED MAINPAGE_MDFILE_PATH)
+            
+            set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "${CMAKE_SOURCE_DIR}/README.md")
+            set(DOXYGEN_INPUT_DIR "${DOXYGEN_INPUT_DIR} ${CMAKE_SOURCE_DIR}/README.md")
+            
+        else()
+        
+            set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "${MAINPAGE_MDFILE_PATH}")
+            set(DOXYGEN_INPUT_DIR "${DOXYGEN_INPUT_DIR} ${MAINPAGE_MDFILE_PATH}")
+            
+        endif()
     else()
-    
-        set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "${MAINPAGE_MDFILE_PATH}")
-        set(DOXYGEN_INPUT_DIR "${DOXYGEN_INPUT_DIR} ${MAINPAGE_MDFILE_PATH}")
-        
-    endif()
+        set(DOXYGEN_STATE ON)
+    endif()    
 
 endfunction()
 
